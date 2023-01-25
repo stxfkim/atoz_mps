@@ -47,34 +47,34 @@ with tab1:
         st.write(attendance_data_df)
    else:st.warning('Data Absensi belum di-upload', icon="⚠️")
 
-   emp_master_last_updated = Path('webapp/raw_temp_data/emp_master_last_updated.txt').read_text()
+   emp_master_last_updated = Path('emp_master_last_updated.txt').read_text()
    st.write("#### Data Master Pegawai")
    st.write("last update:",emp_master_last_updated)
    if employee_master is not None:
         employee_master_df = pd.read_excel(employee_master)
-        employee_master_df.to_csv("webapp/raw_temp_data/temp_employee_master.csv",index=None)
-        f = open('webapp/raw_temp_data/emp_master_last_updated.txt','w')
+        employee_master_df.to_csv("temp_employee_master.csv",index=None)
+        f = open('emp_master_last_updated.txt','w')
         f.write(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M")))
         f.close()
         st.write(employee_master_df)
    else:
-        my_file = Path("webapp/raw_temp_data/temp_employee_master.csv")
+        my_file = Path("temp_employee_master.csv")
         if my_file.is_file():
             st.write(pd.read_csv(my_file))
         else:st.warning('Data Master Pegawai belum di-upload', icon="⚠️")
 
-   holidays_date_last_updated = Path('webapp/raw_temp_data/holidays_date_last_updated.txt').read_text()
+   holidays_date_last_updated = Path('holidays_date_last_updated.txt').read_text()
    st.write("#### Data Libur & Cuti Bersama")
    st.write("last update:",holidays_date_last_updated)
    if holidays_date is not None:
         holidays_date_df = pd.read_excel(holidays_date)
-        holidays_date_df.to_csv("webapp/raw_temp_data/temp_holidays_date.csv",index=None)
-        f = open('webapp/raw_temp_data/holidays_date_last_updated.txt','w')
+        holidays_date_df.to_csv("temp_holidays_date.csv",index=None)
+        f = open('holidays_date_last_updated.txt','w')
         f.write(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M")))
         f.close()
         st.write(holidays_date_df)
    else:
-        my_file = Path("webapp/raw_temp_data/temp_holidays_date.csv")
+        my_file = Path("temp_holidays_date.csv")
         if my_file.is_file():
             st.write(pd.read_csv(my_file))
         else:st.warning('Data Libur & Cuti Bersama belum di-upload', icon="⚠️")
