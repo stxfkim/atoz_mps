@@ -9,20 +9,20 @@ st.set_page_config(page_title="Mini Payroll System", layout="wide")
 with st.sidebar:
 #    st.sidebar.title(":abacus: Mini Payroll System")
 
-    attendance_data = st.sidebar.file_uploader("Upload Data Absensi", type=["xlsx", "xls"])
+    attendance_data = st.sidebar.file_uploader("**Upload Data Absensi**", type=["xlsx", "xls"])
 
     start_date = st.date_input(
-        "Start Date",
+        "**Start Date**",
         datetime.date.today())
     end_date = st.date_input(
-        "End Date",
+        "**End Date**",
         datetime.date.today())
     st.markdown("""---""") 
-    employee_master = st.sidebar.file_uploader("Upload Master Data Pegawai", type=["xlsx", "xls"])
-    holidays_date = st.sidebar.file_uploader("Upload Data Libur & Cuti Bersama", type=["xlsx", "xls"])   
-    denda_scan_masuk = st.number_input('Denda Tidak Scan Masuk',value=25000)
-    denda_scan_pulang = st.number_input('Denda Tidak Scan Pulang',value=25000)
-    uang_makan = st.number_input('Uang Makan Harian',value=15000)
+    employee_master = st.sidebar.file_uploader("**Upload Master Data Pegawai**", type=["xlsx", "xls"])
+    holidays_date = st.sidebar.file_uploader("**Upload Data Libur & Cuti Bersama**", type=["xlsx", "xls"])   
+    denda_scan_masuk = st.number_input('**Denda Tidak Scan Masuk**',value=25000)
+    denda_scan_pulang = st.number_input('**Denda Tidak Scan Pulang**',value=25000)
+    uang_makan = st.number_input('**Uang Makan Harian**',value=15000)
 
 
 font_css = """
