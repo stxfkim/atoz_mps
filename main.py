@@ -150,7 +150,6 @@ with tab2:
         df_kwitansi["start_date"] = start_date
         df_kwitansi["end_date"] = end_date
         df_kwitansi[['nama_worksheet']] = df_kwitansi[['Nama']].replace(' ', '_', regex=True)
-        st.dataframe(df_kwitansi)
         file_list = generate_kwitansi(df_kwitansi)
         
         st.markdown("### Detail Gaji Pekerja Harian (preview)")
