@@ -162,7 +162,7 @@ with tab2:
         file_list.append("kwitansi_output/"+"detail_kwitansi.xlsx")
         file_list.append("kwitansi_output/"+"detail_perhitungan_gaji.xlsx")
 
-        with zipfile.ZipFile("kwitansi_output/"+'kwitansi_'+str(date.today().strftime('%d%b%Y'))+'.zip', 'w') as zipMe:        
+        with zipfile.ZipFile("kwitansi_output/"+'kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip', 'w') as zipMe:        
             for file in file_list:
                 zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
    with col2:
