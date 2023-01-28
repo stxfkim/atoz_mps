@@ -58,7 +58,7 @@ with tab1:
    st.write("#### Data Master Pegawai")
    st.write("last update:",emp_master_last_updated)
    if employee_master is not None:
-        employee_master_df = pd.read_excel(employee_master, dtype={'Nomor Rekening': str})
+        employee_master_df = pd.read_excel(employee_master,  dtype={'Nomor Rekening': str})
         employee_master_df.to_csv("temp_employee_master.csv",index=None)
         f = open('emp_master_last_updated.txt','w')
         f.write(str(datetime.now().strftime("%Y-%m-%d %H:%M")))
@@ -150,30 +150,31 @@ with tab2:
         df_kwitansi["start_date"] = start_date
         df_kwitansi["end_date"] = end_date
         df_kwitansi[['nama_worksheet']] = df_kwitansi[['Nama']].replace(' ', '_', regex=True)
-
+        st.dataframe(df_kwitansi)
         file_list = generate_kwitansi(df_kwitansi)
         
         st.markdown("### Detail Gaji Pekerja Harian (preview)")
         st.write(gaji_pekerja_harian_details)
         st.markdown("### Detail Kwitansi")
+
         st.write(df_kwitansi)
         gaji_pekerja_harian_details.to_excel("kwitansi_output/"+"detail_perhitungan_gaji.xlsx",index=None)
         df_kwitansi.to_excel("kwitansi_output/"+"detail_kwitansi.xlsx",index=None)
 
         file_list.append("kwitansi_output/"+"detail_kwitansi.xlsx")
         file_list.append("kwitansi_output/"+"detail_perhitungan_gaji.xlsx")
-
-        with zipfile.ZipFile("kwitansi_output/"+'kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip', 'w') as zipMe:        
+        st.write(file_list)
+        with zipfile.ZipFile("kwitansi_output/"+'Kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip', 'w') as zipMe:        
             for file in file_list:
                 zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
    with col2:
-    my_file = Path("kwitansi_output/"+'kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip')
+    my_file = Path("kwitansi_output/"+'Kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip')
     if my_file.is_file():
-        with open("kwitansi_output/"+'kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip', "rb") as fp:
+        with open("kwitansi_output/"+'Kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip', "rb") as fp:
             btn = st.download_button(
                 label="Download Kwitansi",
                 data=fp,
-                file_name='kwitansi_'+str(date.today().strftime('%d%b%Y'))+'.zip',
+                file_name='Kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip',
                 mime="application/zip"
             )
 

@@ -72,3 +72,4 @@ def generate_kwitansi(row):
         wb.save("kwitansi_output/"+file_name)
         file_list.append("kwitansi_output/"+file_name)
     return file_list
+
