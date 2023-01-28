@@ -166,9 +166,9 @@ with tab2:
             for file in file_list:
                 zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
    with col2:
-    my_file = Path("kwitansi_output/"+'kwitansi_'+str(date.today().strftime('%d%b%Y'))+'.zip')
+    my_file = Path("kwitansi_output/"+'kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip')
     if my_file.is_file():
-        with open("kwitansi_output/"+'kwitansi_'+str(date.today().strftime('%d%b%Y'))+'.zip', "rb") as fp:
+        with open("kwitansi_output/"+'kwitansi_'+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+'.zip', "rb") as fp:
             btn = st.download_button(
                 label="Download Kwitansi",
                 data=fp,
