@@ -154,9 +154,9 @@ with tab2:
         file_list = generate_kwitansi(df_kwitansi)
         
         st.markdown("### Detail Gaji Pekerja Harian (preview)")
-        st.write(gaji_pekerja_harian_details, formatter="{:.2f}")
+        st.write(gaji_pekerja_harian_details)
         st.markdown("### Detail Kwitansi")
-        st.write(df_kwitansi, formatter="{:.2f}")
+        st.write(df_kwitansi)
         gaji_pekerja_harian_details.to_excel("kwitansi_output/"+"detail_perhitungan_gaji.xlsx",index=None)
         df_kwitansi.to_excel("kwitansi_output/"+"detail_kwitansi.xlsx",index=None)
 
