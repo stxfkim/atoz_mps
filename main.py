@@ -50,6 +50,7 @@ with tab1:
    st.write("#### Data Absensi")
    if attendance_data is not None:
         attendance_data_df = pd.read_excel(attendance_data)
+        attendance_data_df["Tanggal"] = pd.to_datetime(attendance_data_df["Tanggal"], dayfirst=True)
         st.write(attendance_data_df)
    else:st.warning('Data Absensi belum di-upload', icon="⚠️")
 
@@ -100,7 +101,7 @@ with tab2:
 
    if btnHitungGaji:
     with st.spinner('Loading....'):
-        attendance_data_df["Tanggal"] = pd.to_datetime(attendance_data_df['Tanggal'])
+        attendance_data_df["Tanggal"] = pd.to_datetime(attendance_data_df['Tanggal'], format='%d-%m-%Y')
         attendance_data_df["Tanggal"] = attendance_data_df["Tanggal"].dt.date
         filtered_attendance_df = attendance_data_df[attendance_data_df['Tanggal'].between(start_date, end_date)]
         # join to get payroll details
