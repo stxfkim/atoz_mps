@@ -37,10 +37,6 @@ def check_password():
         # Password correct.
         return True
 
-if check_password():
-    st.write("Here goes your normal Streamlit app...")
-    st.button("Click me")
-
 def calculate_work_hours(row):
     time_delta = row["scan_pulang"] - row["scan_masuk"]
     time_delta = str(time_delta)
