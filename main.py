@@ -14,6 +14,7 @@ from openpyxl.styles.alignment import Alignment
 
 
 
+
 if check_password():
     st.set_page_config(page_title="Mini Payroll System", layout="wide")
     with st.sidebar:
@@ -37,17 +38,6 @@ if check_password():
         uang_makan = st.number_input("**Uang Makan Harian**", value=15000)
 
 
-    font_css = """
-    <style>
-    button[data-baseweb="tab"] > div[data-testid="stMarkdownContainer"] > p {
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: 0%;
-    }
-    </style>
-    """
-
-    st.write(font_css, unsafe_allow_html=True)
 
     tab1, tab2, tab3 = st.tabs(
         ["Raw Data ", "Hitung Gaji Harian", "Generate Report Jam Kerja"]
@@ -309,3 +299,17 @@ if check_password():
     with tab3:
         st.header("TBU")
         st.write(employee_master_df)
+        
+font_css = """
+    <style>
+    button[data-baseweb="tab"] > div[data-testid="stMarkdownContainer"] > p {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 0%;
+    }
+
+    #MainMenu {visibility: hidden;}
+
+    """
+
+st.markdown(font_css, unsafe_allow_html=True)
