@@ -5,12 +5,14 @@ from datetime import date
 from pathlib import Path
 import zipfile
 import warnings
+from functions import *
 
+from functions import check_password
 warnings.filterwarnings("ignore")
 from openpyxl import load_workbook
 from openpyxl.styles.alignment import Alignment
 
-from functions import *
+
 
 if check_password():
     st.set_page_config(page_title="Mini Payroll System", layout="wide")

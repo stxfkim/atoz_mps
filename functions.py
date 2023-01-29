@@ -6,7 +6,6 @@ import warnings
 warnings.filterwarnings('ignore')
 from openpyxl import load_workbook
 from openpyxl.styles.alignment import Alignment
-
 import streamlit as st
 
 def check_password():
