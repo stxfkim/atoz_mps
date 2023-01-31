@@ -64,9 +64,33 @@ def calculate_salary(row):
     total_gaji_harian = (gaji_harian + gaji_lembur + row["uang_makan_harian"]) - (row["denda_tidak_scan_masuk"]+row["denda_tidak_scan_pulang"])
     return gaji_harian, gaji_lembur, total_gaji_harian
 
+def int_to_roman(num):
+    values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+    symbols = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"]
+    result = ""
+    for v, s in zip(values, symbols):
+        result += s * (num // v)
+        num %= v
+    return result
 
 def generate_kwitansi(row):
     file_list = []
+    today = date.today()
+
+    current_month = today.month
+    current_year = str(today.year % 100)
+    current_date = datetime.now()
+    
+    try:
+        with open("last_count.txt", "r") as file:
+            last_count = int(file.read())
+    except FileNotFoundError:
+        last_count = 0
+
+    if current_date.day == 1:
+        last_count=0
+
+
     for idx,row in row.iterrows():
         wb = load_workbook("Template Kwitansi.xlsx")
         sheet = wb.active
@@ -91,7 +115,8 @@ def generate_kwitansi(row):
         sheet.cell(row=5, column=22).value= date.today().strftime('%d %b %Y')
         sheet.cell(row=32, column=7).value= date.today().strftime('%d %b %Y')
         # V3 - Nomor Kwitansi
-        sheet.cell(row=3, column=22).value= "KWT_ATS_VII-22_"
+        last_count=last_count+1
+        sheet.cell(row=3, column=22).value= "KWT_ATS_"+int_to_roman(current_month)+"_"+current_year+"_"+str(last_count)
         # M14 & R14 - Periode Upah
         sheet.cell(row=14, column=13).value=row["start_date"]
         sheet.cell(row=14, column=18).value=row["end_date"]
@@ -100,5 +125,7 @@ def generate_kwitansi(row):
         file_name = "Kwitansi_"+row["nama_worksheet"]+"_"+str(row["start_date"].strftime('%d%b'))+"-"+str(row["end_date"].strftime('%d%b%Y'))+".xlsx"
         wb.save("kwitansi_output/"+file_name)
         file_list.append("kwitansi_output/"+file_name)
+    with open("last_count.txt", "w") as file:
+        file.write(str(last_count))
     return file_list
 
