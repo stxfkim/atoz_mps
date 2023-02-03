@@ -133,6 +133,10 @@ if check_password():
                     right_on="PIN/ID",
                     how="left",
                 )
+                
+                absensi_emp_master = absensi_emp_master[absensi_emp_master["Keterangan Tidak Hadir"].isnull()]
+
+                
                 absensi_emp_master["Tanggal"] = pd.to_datetime(
                     absensi_emp_master["Tanggal"]
                 )
@@ -198,7 +202,7 @@ if check_password():
                 pekerja_harian["uang_makan_harian"] = pekerja_harian["Uang Makan"].apply(
                     lambda x: uang_makan if x == "Y" else 0
                 )
-
+                st.write(pekerja_harian)
                 # calculate working hours
                 pekerja_harian[
                     ["jam_kerja", "jam_lembur", "timedelta"]
