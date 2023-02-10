@@ -134,8 +134,7 @@ if check_password():
                     how="left",
                 )
                 
-                absensi_emp_master = absensi_emp_master[absensi_emp_master["Keterangan Tidak Hadir"].isnull()]
-
+                #absensi_emp_master = absensi_emp_master[absensi_emp_master["Keterangan Tidak Hadir"].isnull()]
                 
                 absensi_emp_master["Tanggal"] = pd.to_datetime(
                     absensi_emp_master["Tanggal"]
@@ -202,7 +201,7 @@ if check_password():
                 pekerja_harian["uang_makan_harian"] = pekerja_harian["Uang Makan"].apply(
                     lambda x: uang_makan if x == "Y" else 0
                 )
-                st.write(pekerja_harian)
+
                 # calculate working hours
                 pekerja_harian[
                     ["jam_kerja", "jam_lembur", "timedelta"]
@@ -301,8 +300,140 @@ if check_password():
 
 
     with tab3:
-        st.header("TBU")
-        st.write(employee_master_df)
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            btnGenerateReportWH = st.button(
+                "Generate Report", help="klik tombol ini untuk generate report", type="primary"
+            )
+
+        if btnGenerateReportWH:
+            with st.spinner("Loading...."):
+                master_emp = pd.read_csv(
+                    "temp_employee_master.csv", dtype={"Nomor Rekening": str}
+                )
+                holidays_date_df = pd.read_csv("temp_holidays_date.csv")
+                absensi_emp_master = attendance_data_df.merge(
+                                    master_emp[
+                                        [
+                                            "PIN/ID",
+                                            "Keterangan",
+                                        ]
+                                    ],
+                                    left_on="NIP",
+                                    right_on="PIN/ID",
+                                    how="left",
+                                )
+                absensi_emp_master["Tanggal"] = pd.to_datetime(
+                                    absensi_emp_master["Tanggal"]
+                                )
+                holidays_date_df["Tanggal Libur"] = pd.to_datetime(
+                                    holidays_date_df["Tanggal Libur"]
+                                )
+                absensi_emp_master["weekday"] = absensi_emp_master["Tanggal"].dt.day_name()
+
+                absensi_emp_master = absensi_emp_master.merge(
+                                    holidays_date_df,
+                                    left_on="Tanggal",
+                                    right_on="Tanggal Libur",
+                                    how="left",
+                                )
+                absensi_emp_master["is_holiday"] = (
+                                    absensi_emp_master["Tanggal"]
+                                    .isin(holidays_date_df["Tanggal Libur"])
+                                    .apply(lambda x: "Y" if x else "N")
+                                )
+                absensi_emp_master = absensi_emp_master.drop(
+                                    columns=["PIN/ID", "Tanggal Libur","Jabatan","Departemen","Kantor","PIN","Uang Makan"]
+                                )
+                # convert Scan related column into datetime
+                all_worker_scan = absensi_emp_master.drop(columns=["Tidak Scan Masuk", "Tidak Scan Pulang"])
+                for col in list(all_worker_scan.filter(regex="Scan ").columns):
+                    absensi_emp_master[col] = pd.to_datetime(all_worker_scan[col], format="%H:%M:%S")
+
+                absensi_emp_master["Tanggal"] = pd.to_datetime(absensi_emp_master["Tanggal"])
+
+                absensi_emp_master["scan_masuk"] = absensi_emp_master[list(all_worker_scan.filter(regex="Scan").columns)].min(axis=1)
+
+                absensi_emp_master["scan_pulang"] = absensi_emp_master[list(all_worker_scan.filter(regex="Scan").columns)].max(axis=1)
+                absensi_emp_master["scan_pulang"] = absensi_emp_master.apply(
+                                    lambda x: pd.NaT
+                                    if x["Tidak Scan Pulang"] == "Y"
+                                    else x["scan_pulang"],axis=1
+                                )
+
+                absensi_emp_master["scan_masuk"] = absensi_emp_master.apply(
+                                    lambda x: pd.Timestamp("1900-01-01T09")
+                                    if x["scan_masuk"] <= pd.Timestamp("1900-01-01T09") and x["Tidak Scan Masuk"] != "Y"
+                                    else x["scan_masuk"],axis=1
+                                )
+
+
+                # daily worker early scan (before 9AM)
+
+
+                absensi_emp_master[["jam_kerja", "jam_lembur", "timedelta"]] = absensi_emp_master.apply(calculate_work_hours, axis=1, result_type="expand")
+
+                absensi_emp_master["kedisiplinan"] = absensi_emp_master.apply(check_kedisiplinan, axis=1, result_type="expand")
+
+                absensi_emp_master["total_jam_kerja"] = absensi_emp_master["jam_kerja"] + absensi_emp_master["jam_lembur"] 
+                
+                output = absensi_emp_master[["NIP","Nama","Keterangan","weekday","Tanggal","scan_masuk","scan_pulang","jam_kerja","jam_lembur","total_jam_kerja","kedisiplinan"]]
+
+                output.sort_values(['NIP', 'Tanggal'], inplace=True)
+                st.markdown("### Detail Total Jam Kerja")
+                st.dataframe(output)
+                output.to_excel("report_output/" + "rekap_working_hours.xlsx",index=False)
+
+                grouped = output.groupby(['NIP', 'Nama'])["kedisiplinan"].value_counts().unstack(fill_value=0).reset_index()
+                grouped.to_excel("report_output/" + "rekap_kedisiplinan.xlsx",index=False)
+                st.markdown("### Detail Kedisiplinan")
+                st.markdown("Kedisiplinan Periode "+ str(start_date.strftime("%d%b"))+ " -"+ str(end_date.strftime("%d%b%Y")))
+                st.dataframe(grouped)
+                file_list = []
+                file_list.append("report_output/" + "rekap_working_hours.xlsx")
+                file_list.append("report_output/" + "rekap_kedisiplinan.xlsx")
+                with zipfile.ZipFile(
+                    "report_output/"
+                    + "Report_"
+                    + str(start_date.strftime("%d%b"))
+                    + "-"
+                    + str(end_date.strftime("%d%b%Y"))
+                    + ".zip",
+                    "w",
+                ) as zipMe:
+                    for file in file_list:
+                        zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
+        with col2:
+            my_file = Path(
+                "report_output/"
+                + "Report_"
+                + str(start_date.strftime("%d%b"))
+                + "-"
+                + str(end_date.strftime("%d%b%Y"))
+                + ".zip"
+            )
+            if my_file.is_file():
+                with open(
+                    "report_output/"
+                    + "Report_"
+                    + str(start_date.strftime("%d%b"))
+                    + "-"
+                    + str(end_date.strftime("%d%b%Y"))
+                    + ".zip",
+                    "rb",
+                ) as fp:
+                    btn = st.download_button(
+                        label="Download Report",
+                        data=fp,
+                        file_name="Report_"
+                        + str(start_date.strftime("%d%b"))
+                        + "-"
+                        + str(end_date.strftime("%d%b%Y"))
+                        + ".zip",
+                        mime="application/zip",
+                    )
         
 font_css = """
     <style>

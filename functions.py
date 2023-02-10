@@ -36,23 +36,27 @@ def check_password():
         # Password correct.
         return True
 
-def calculate_work_hours(row):
-    time_delta = row["scan_pulang"] - row["scan_masuk"]
-    time_delta = str(time_delta)
-    hours = int(time_delta[7:9])
-    minutes = int(time_delta[10:12])
-    if minutes >= 50:
-        hours += 1
-    elif minutes >= 20:
-        hours += 0.5
 
-    if hours <= 8:
-        jam_kerja = hours
-        jam_lembur = 0
-    elif hours > 8:
-        jam_kerja = 8
-        jam_lembur = hours - 8
-    return jam_kerja, jam_lembur, time_delta
+def calculate_work_hours(row):
+    if pd.isna(row["Keterangan Tidak Hadir"]) and not pd.isna(row["scan_masuk"]) and not pd.isna(row["scan_pulang"]):
+        time_delta = row["scan_pulang"] - row["scan_masuk"]
+        time_delta = str(time_delta)
+        hours = int(time_delta[7:9])
+        minutes = int(time_delta[10:12])
+        if minutes >= 50:
+            hours += 1
+        elif minutes >= 20:
+            hours += 0.5
+
+        if hours <= 8:
+            jam_kerja = hours
+            jam_lembur = 0
+        elif hours > 8:
+            jam_kerja = 8
+            jam_lembur = hours - 8
+        return jam_kerja, jam_lembur, time_delta
+    else:
+        return float('nan'), float('nan'), float('nan')
 
 def calculate_salary(row):
     if  row["Tanggal"].weekday() == 6 or row["is_holiday"] == "Y": # tambahin kondisi kalo hari libur
@@ -129,3 +133,11 @@ def generate_kwitansi(row):
         file.write(str(last_count))
     return file_list
 
+def check_kedisiplinan(row):
+    working_hour_start = pd.Timestamp("9:00:00")
+    if not pd.isna(row["Keterangan Tidak Hadir"]):
+        return row["Keterangan Tidak Hadir"]
+    elif row["Tidak Scan Masuk"] == "Y" or pd.isna(row["scan_masuk"]):
+        return "Tidak Scan Masuk"
+    elif row["Tidak Scan Pulang"] == "Y" or pd.isna(row["scan_pulang"]):
+        return "Tidak Scan Pulang"
