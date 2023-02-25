@@ -225,6 +225,8 @@ if check_password():
                     pekerja_harian, total_gaji_df, on="NIP", how="left"
                 )
 
+                gaji_pekerja_harian_details["gaji_final"] = gaji_pekerja_harian_details["gaji_final_sebelum_kasbon"] - gaji_pekerja_harian_details["total_kasbon"] 
+                
                 df_kwitansi = (
                     gaji_pekerja_harian_details[
                         [
