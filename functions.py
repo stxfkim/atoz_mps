@@ -40,9 +40,11 @@ def check_password():
 def calculate_work_hours(row):
     if pd.isna(row["Keterangan Tidak Hadir"]) and not pd.isna(row["scan_masuk"]) and not pd.isna(row["scan_pulang"]):
         time_delta = row["scan_pulang"] - row["scan_masuk"]
-        time_delta = str(time_delta)
-        hours = int(time_delta[7:9])
-        minutes = int(time_delta[10:12])
+        
+        hours = time_delta.components.hours
+        minutes = time_delta.components.minutes
+        seconds = time_delta.components.seconds
+        td = "{h}:{m}:{s}".format(h = hours, m = minutes,s=seconds)
         if minutes >= 50:
             hours += 1
         elif minutes >= 20:
@@ -54,9 +56,19 @@ def calculate_work_hours(row):
         elif hours > 8:
             jam_kerja = 8
             jam_lembur = hours - 8
-        return jam_kerja, jam_lembur, time_delta
+        return jam_kerja, jam_lembur, td
     else:
         return float('nan'), float('nan'), float('nan')
+
+def calculate_scan_time(row):
+    if row["Pulang Tengah Malam"] == "Y":
+        scan_masuk= row["scan_max"]
+        scan_pulang = row["scan_min"]
+    else:
+        scan_masuk = row["scan_min"]
+        scan_pulang = row["scan_max"]
+    return scan_masuk, scan_pulang
+
 
 def calculate_salary(row):
     if  row["Tanggal"].weekday() == 6 or row["is_holiday"] == "Y": # tambahin kondisi kalo hari libur
@@ -112,7 +124,7 @@ def generate_kwitansi(row):
         sheet.merge_cells('E24:K24')
         sheet.cell(row=24, column=5).alignment = Alignment(horizontal='left', vertical='center')
         # G28 - Nama Bank & Nama Akun Bank
-        sheet.cell(row=28, column=7).value=row["Nama Bank"][1] + " A/n "+ row["Nama Akun Bank"][1]
+        sheet.cell(row=28, column=7).value=row["Nama Bank"] + " A/n "+ row["Nama Akun Bank"]
         # G30 - Nomor Rekening
         sheet.cell(row=30, column=7).value=row["Nomor Rekening"]
         # V5 & G32 - tanggal dicetak

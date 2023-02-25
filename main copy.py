@@ -177,17 +177,13 @@ if check_password():
                 pekerja_harian["Tanggal"] = pd.to_datetime(pekerja_harian["Tanggal"])
 
                 # get scan_masuk and scan_pulang
-                pekerja_harian["scan_min"] = pekerja_harian[
+                pekerja_harian["scan_masuk"] = pekerja_harian[
                     list(pekerja_harian_scan.filter(regex="Scan").columns)
                 ].min(axis=1)
-                pekerja_harian["scan_max"] = pekerja_harian[
+                pekerja_harian["scan_pulang"] = pekerja_harian[
                     list(pekerja_harian_scan.filter(regex="Scan").columns)
                 ].max(axis=1)
-                
-                pekerja_harian[
-                    ["scan_masuk", "scan_pulang"]
-                ] = pekerja_harian.apply(calculate_scan_time, axis=1, result_type="expand")
-              
+
                 # daily worker early scan (before 8AM)
                 pekerja_harian["scan_masuk"] = pekerja_harian["scan_masuk"].apply(
                     lambda x: pd.Timestamp("1900-01-01T08")
@@ -205,7 +201,7 @@ if check_password():
                 pekerja_harian["uang_makan_harian"] = pekerja_harian["Uang Makan"].apply(
                     lambda x: uang_makan if x == "Y" else 0
                 )
-                
+
                 # calculate working hours
                 pekerja_harian[
                     ["jam_kerja", "jam_lembur", "timedelta"]
@@ -217,10 +213,11 @@ if check_password():
 
                 total_gaji_df = (
                     pekerja_harian.groupby("NIP")
-                    .agg({"total_gaji_harian": "sum","Kasbon": "sum"})
-                    .rename(columns={"total_gaji_harian": "gaji_final_sebelum_kasbon","Kasbon": "total_kasbon"})
+                    .agg({"total_gaji_harian": "sum"})
+                    .rename(columns={"total_gaji_harian": "gaji_final"})
                     .reset_index()
                 )
+
                 gaji_pekerja_harian_details = pd.merge(
                     pekerja_harian, total_gaji_df, on="NIP", how="left"
                 )
@@ -233,14 +230,12 @@ if check_password():
                             "Nama Bank",
                             "Nama Akun Bank",
                             "Nomor Rekening",
-                            "total_kasbon",
-                            "gaji_final_sebelum_kasbon"
+                            "gaji_final",
                         ]
                     ]
                     .drop_duplicates()
                     .reset_index(drop=True)
                 )
-                df_kwitansi["gaji_final"] = df_kwitansi["gaji_final_sebelum_kasbon"] - df_kwitansi["total_kasbon"] 
                 df_kwitansi["start_date"] = start_date
                 df_kwitansi["end_date"] = end_date
                 df_kwitansi[["nama_worksheet"]] = df_kwitansi[["Nama"]].replace(
