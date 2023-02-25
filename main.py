@@ -386,7 +386,7 @@ if check_password():
                 st.dataframe(output)
                 output.to_excel("report_output/" + "rekap_working_hours.xlsx",index=False)
 
-                grouped = output.groupby(['NIP', 'Nama'])["kedisiplinan"].value_counts().unstack(fill_value=0).reset_index()
+                grouped = output.groupby(['NIP', 'Nama',"Keterangan",])["kedisiplinan"].value_counts().unstack(fill_value=0).reset_index()
                 grouped.to_excel("report_output/" + "rekap_kedisiplinan.xlsx",index=False)
                 st.markdown("### Detail Kedisiplinan")
                 st.markdown("Kedisiplinan Periode "+ str(start_date.strftime("%d%b"))+ " -"+ str(end_date.strftime("%d%b%Y")))
