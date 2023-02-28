@@ -210,7 +210,7 @@ if check_password():
                 pekerja_harian[
                     ["jam_kerja", "jam_lembur", "timedelta"]
                 ] = pekerja_harian.apply(calculate_work_hours, axis=1, result_type="expand")
-
+                st.write(pekerja_harian)
                 pekerja_harian[
                     ["gaji_harian", "gaji_lembur", "total_gaji_harian"]
                 ] = pekerja_harian.apply(calculate_salary, axis=1, result_type="expand")
