@@ -154,3 +154,4 @@ def check_kedisiplinan(row):
         return "Tidak Scan Masuk"
     elif row["Tidak Scan Pulang"] == "Y" or pd.isna(row["scan_pulang"]):
         return "Tidak Scan Pulang"
+
