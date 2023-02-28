@@ -75,6 +75,7 @@ def calculate_salary(row):
         gaji_harian = (row["jam_kerja"]/8) * (float(row["Upah Lembur"])*1.5)
         gaji_lembur = row["jam_lembur"]* (float(row["Upah Lembur"])*1.5)
     else:    
+        
         gaji_harian = (row["jam_kerja"]/8) * float(row["Gaji Harian (Pokok)"])
         gaji_lembur = row["jam_lembur"]*float(row["Upah Lembur"])
     total_gaji_harian = (gaji_harian + gaji_lembur + row["uang_makan_harian"]) - (row["denda_tidak_scan_masuk"]+row["denda_tidak_scan_pulang"])
