@@ -72,7 +72,7 @@ def calculate_scan_time(row):
 
 def calculate_salary(row):
     if  row["Tanggal"].weekday() == 6 or row["is_holiday"] == "Y": # tambahin kondisi kalo hari libur
-        gaji_harian = (row["jam_kerja"]/8) * (float(row["Upah Lembur"])*1.5)
+        gaji_harian = (row["jam_kerja"]/8) * (float(row["Gaji Harian (Pokok)"])*1.5)
         gaji_lembur = row["jam_lembur"]* (float(row["Upah Lembur"])*1.5)
     else:    
         
