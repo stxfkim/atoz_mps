@@ -227,6 +227,46 @@ if check_password():
 
                 gaji_pekerja_harian_details["gaji_final"] = gaji_pekerja_harian_details["gaji_final_sebelum_kasbon"] - gaji_pekerja_harian_details["total_kasbon"] 
                 
+                df_ph_details = (
+                gaji_pekerja_harian_details[
+                        [
+                            "NIP",
+                            "Nama",
+                            "Tanggal",
+                            "Keterangan",
+                            "Gaji Harian (Pokok)",
+                            "Upah Lembur",
+                            "Keterangan Libur",
+                            "scan_masuk",
+                            "scan_pulang",
+                            "denda_tidak_scan_masuk",
+                            "denda_tidak_scan_pulang",
+                            "uang_makan_harian",
+                            "jam_kerja",
+                            "jam_lembur",
+                            "timedelta",
+                            "gaji_harian",
+                            "gaji_lembur",
+                            "total_gaji_harian",
+                            "gaji_final_sebelum_kasbon",
+                            "total_kasbon",
+                            "gaji_final"
+                        ]
+                    ]
+                )
+                st.markdown("### Detail Gaji Pekerja Harian (preview)")
+                st.dataframe(df_ph_details)
+
+
+                ph_list_nip = df_ph_details["NIP"].drop_duplicates().values.tolist()
+                ph_list_filename = []
+                for idx in range(len(ph_list_nip)):
+                    temp_df = df_ph_details[df_ph_details["NIP"] == ph_list_nip[idx]]
+                    nama_str = temp_df['Nama'].head(1).to_string(index=False).replace(' ', '_')
+                    file_name = "Details_"+nama_str+"_"+str(start_date.strftime('%d%b'))+"-"+str(end_date.strftime('%d%b%Y'))+".xlsx"
+                    temp_df.to_excel("kwitansi_output/" + file_name, index=None)
+                    ph_list_filename.append("kwitansi_output/" + file_name)
+                
                 df_kwitansi = (
                     gaji_pekerja_harian_details[
                         [
@@ -250,10 +290,8 @@ if check_password():
                 )
                 file_list = generate_kwitansi(df_kwitansi)
 
-                st.markdown("### Detail Gaji Pekerja Harian (preview)")
-                st.dataframe(gaji_pekerja_harian_details)
+                
                 st.markdown("### Detail Kwitansi")
-
                 st.write(df_kwitansi)
                 gaji_pekerja_harian_details.to_excel(
                     "kwitansi_output/" + "detail_perhitungan_gaji.xlsx", index=None
@@ -264,6 +302,7 @@ if check_password():
 
                 file_list.append("kwitansi_output/" + "detail_kwitansi.xlsx")
                 file_list.append("kwitansi_output/" + "detail_perhitungan_gaji.xlsx")
+                file_list+=ph_list_filename
                 with zipfile.ZipFile(
                     "kwitansi_output/"
                     + "Kwitansi_"
